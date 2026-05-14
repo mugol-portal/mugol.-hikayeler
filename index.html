@@ -92,7 +92,8 @@
             background: var(--header-bg);
             color: #fff;
             border-bottom: 3px solid var(--accent);
-            padding: 0.9rem 1.8rem;
+            padding: 0.5rem 1.4rem;
+            min-height: 76px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -102,7 +103,7 @@
             box-shadow: 0 4px 30px rgba(0,0,0,0.25);
         }
 
-        .header-left { display: flex; align-items: center; gap: 14px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
 
         .header-brand {
             display: flex;
@@ -110,9 +111,22 @@
             gap: 10px;
             font-family: 'Playfair Display', serif;
             font-weight: 800;
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             color: var(--accent2);
             letter-spacing: 0.02em;
+        }
+
+        .logo-img {
+            width: 68px !important;
+            height: 68px !important;
+            min-width: 68px !important;
+            min-height: 68px !important;
+            max-width: 68px !important;
+            max-height: 68px !important;
+            object-fit: contain !important;
+            border-radius: 14px !important;
+            flex-shrink: 0 !important;
+            display: block !important;
         }
 
         .brand-icon {
@@ -869,11 +883,32 @@
         ::-webkit-scrollbar-thumb { background: rgba(194,98,45,0.3); border-radius: 6px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-        /* ═══════════════════ RESPONSIVE ═══════════════════ */
+        /* ═══════════════════ SIRALAMA ═══════════════════ */
+        .sort-opt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 9px 12px;
+            border: none;
+            background: none;
+            color: var(--text-mid);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.87rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: 0.2s;
+            text-align: left;
+        }
+        .sort-opt:hover { background: rgba(194,98,45,0.1); color: var(--accent); }
+        .sort-opt.active { background: linear-gradient(135deg,var(--accent),var(--accent2)); color: white; }
+        .sort-opt i { width: 16px; text-align: center; font-size: 0.8rem; }
+
         @media (max-width: 600px) {
-            header { padding: 0.8rem 1rem; }
+            header { padding: 0.4rem 0.9rem; }
             .header-brand span { display: none; }
-            .search-container { max-width: 200px; margin: 0 10px; }
+            .search-container { max-width: 180px; margin: 0 8px; }
             .container { grid-template-columns: 1fr; gap: 1.2rem; padding: 0 1rem; }
             .stats-bar { gap: 1rem; font-size: 0.67rem; flex-wrap: wrap; }
         }
@@ -894,7 +929,7 @@
                 <i class="fas fa-bars"></i>
             </button>
             <div class="header-brand">
-                <img src="logo.png" alt="MuGöl Logo" style="width:52px;height:52px;object-fit:contain;border-radius:12px;">
+                <img src="logo.png" alt="MuGöl Logo" class="logo-img">
                 <span>MuGöl Hikayeler</span>
             </div>
         </div>
@@ -904,10 +939,37 @@
             <input type="text" id="searchInput" placeholder="Hikaye ara..." oninput="render()">
         </div>
 
-        <button class="icon-btn" onclick="toggleSidebar('right')" title="Ayarlar">
-            <i class="fas fa-sliders-h"></i>
-        </button>
     </header>
+
+    <!-- SIRALAMA PANELİ -->
+    <div id="sortPanel" style="display:none;position:fixed;top:80px;left:306px;z-index:5000;background:var(--bg-card2);border:1.5px solid var(--border-color);border-radius:16px;padding:8px;box-shadow:var(--shadow-md);min-width:190px;">
+        <div style="font-size:0.68rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:0.1em;padding:6px 10px 8px;">Sıralama</div>
+        <button class="sort-opt active" onclick="setSort('default',this)"><i class="fas fa-list"></i> Varsayılan</button>
+        <button class="sort-opt" onclick="setSort('alpha',this)"><i class="fas fa-font"></i> A → Z</button>
+        <button class="sort-opt" onclick="setSort('alpha-desc',this)"><i class="fas fa-font"></i> Z → A</button>
+        <button class="sort-opt" onclick="setSort('progress',this)"><i class="fas fa-circle-notch"></i> İlerleme</button>
+        <button class="sort-opt" onclick="setSort('shortest',this)"><i class="far fa-clock"></i> En Kısa</button>
+        <button class="sort-opt" onclick="setSort('longest',this)"><i class="fas fa-clock"></i> En Uzun</button>
+    </div>
+
+    <!-- MİNİ OYNATICI (reader kapalıyken) -->
+    <div id="miniPlayer" style="display:none;position:fixed;bottom:20px;right:20px;z-index:4500;background:linear-gradient(135deg,var(--accent),var(--accent-gold));border-radius:50px;padding:10px 18px;box-shadow:0 8px 30px rgba(194,98,45,0.5);display:none;align-items:center;gap:12px;cursor:pointer;max-width:280px;animation:slideUp 0.3s ease;">
+        <div onclick="resumeMiniPlayer()" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+            <div style="width:36px;height:36px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-music" style="color:white;font-size:0.85rem;"></i>
+            </div>
+            <div style="min-width:0;">
+                <div style="font-size:0.65rem;color:rgba(255,255,255,0.8);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Oynatılıyor</div>
+                <div id="miniTitle" style="font-family:'Playfair Display',serif;font-weight:700;color:white;font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;"></div>
+            </div>
+        </div>
+        <button id="miniPlayBtn" onclick="toggleMiniPlay(event)" style="background:rgba(255,255,255,0.25);border:none;width:36px;height:36px;border-radius:50%;color:white;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-pause"></i>
+        </button>
+        <button onclick="closeMiniPlayer(event)" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:0.9rem;cursor:pointer;padding:2px;flex-shrink:0;">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
 
     <div class="stats-bar" id="statsBar">
         <span><i class="fas fa-book-open"></i> <span id="totalCount">0</span> Hikaye</span>
@@ -927,6 +989,21 @@
             </li>
             <li class="side-item" onclick="filterBy('favorites', this)">
                 <i class="fas fa-bookmark"></i> Favorilerim
+            </li>
+        </ul>
+        <div style="margin: 0 1rem; border-top: 1px solid rgba(255,255,255,0.08);"></div>
+        <ul class="side-list">
+            <li class="side-item" onclick="openRandomStory(); closeSidebars();">
+                <i class="fas fa-random"></i> Rastgele Hikaye
+            </li>
+            <li class="side-item" id="sortBtn" onclick="toggleSort()">
+                <i class="fas fa-sort-amount-down" id="sortIcon"></i> Sıralama
+            </li>
+            <li class="side-item" onclick="showStats(); closeSidebars();">
+                <i class="fas fa-chart-bar"></i> İstatistikler
+            </li>
+            <li class="side-item" onclick="closeSidebars(); setTimeout(function(){ toggleSidebar('right'); }, 300);">
+                <i class="fas fa-sliders-h"></i> Ayarlar
             </li>
         </ul>
     </nav>
@@ -1005,10 +1082,29 @@
             </div>
 
             <div class="setting-item">
-                <div class="setting-label">Veri Dosyası</div>
-                <button class="font-btn" style="width:100%; gap:8px; display:flex; align-items:center; justify-content:center;" onclick="downloadKayitJs()">
-                    <i class="fas fa-download"></i> hikaye-kayit.js İndir
+                <div class="setting-label" style="display:flex;justify-content:space-between;">
+                    <span>Uyku Zamanlayıcısı</span>
+                    <span id="sleepCountdown" style="color:var(--accent);font-weight:700;"></span>
+                </div>
+                <select id="sleepSelect" class="select-ui" onchange="setSleepTimer(this.value)">
+                    <option value="0">Kapalı</option>
+                    <option value="5">5 dakika</option>
+                    <option value="10">10 dakika</option>
+                    <option value="15">15 dakika</option>
+                    <option value="30">30 dakika</option>
+                    <option value="60">1 saat</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-label">Veri Yedekleme</div>
+                <button class="font-btn" style="width:100%;margin-bottom:8px;gap:8px;display:flex;align-items:center;justify-content:center;" onclick="exportData()">
+                    <i class="fas fa-file-export"></i> Verileri Dışa Aktar
                 </button>
+                <label class="font-btn" style="width:100%;gap:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                    <i class="fas fa-file-import"></i> Verileri İçe Aktar
+                    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importData(event)">
+                </label>
             </div>
 
         </div>
@@ -1076,6 +1172,7 @@
         let fontSz = MuGolKayit.settings.getFontSize();
         let activeCat = 'all';
         let currentStoryId = null;
+        let sortMode = 'default';
         const synth = window.speechSynthesis;
         let voices = [];
 
@@ -1225,11 +1322,32 @@
                 listToRender = favIds.filter(id => window['story_' + id]);
             }
 
+            // Filtre + arama
+            listToRender = listToRender.filter(id => {
+                const data = window['story_' + id];
+                if (!data) return false;
+                if (activeCat !== 'all' && activeCat !== 'favorites' && data.category !== activeCat) return false;
+                if (!data.title.toLowerCase().includes(q)) return false;
+                return true;
+            });
+
+            // Sıralama
+            const allProg = MuGolKayit.progress.getAll();
+            if (sortMode === 'alpha') {
+                listToRender.sort((a,b) => (window['story_'+a]?.title||'').localeCompare(window['story_'+b]?.title||'','tr'));
+            } else if (sortMode === 'alpha-desc') {
+                listToRender.sort((a,b) => (window['story_'+b]?.title||'').localeCompare(window['story_'+a]?.title||'','tr'));
+            } else if (sortMode === 'progress') {
+                listToRender.sort((a,b) => (allProg[b]||0) - (allProg[a]||0));
+            } else if (sortMode === 'shortest') {
+                listToRender.sort((a,b) => (window['story_'+a]?.content||'').split(/\s+/).length - (window['story_'+b]?.content||'').split(/\s+/).length);
+            } else if (sortMode === 'longest') {
+                listToRender.sort((a,b) => (window['story_'+b]?.content||'').split(/\s+/).length - (window['story_'+a]?.content||'').split(/\s+/).length);
+            }
+
             listToRender.forEach((id, idx) => {
                 const data = window['story_' + id];
                 if (!data) return;
-                if (activeCat !== 'all' && activeCat !== 'favorites' && data.category !== activeCat) return;
-                if (!data.title.toLowerCase().includes(q)) return;
 
                 count++;
                 const wordCount = data.content.split(/\s+/).length;
@@ -1430,6 +1548,7 @@
         }
 
         function closeReader() {
+            const wasPlaying = isPlaying;
             synth.cancel();
             isPlaying = false;
             document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
@@ -1439,6 +1558,8 @@
             document.body.style.overflow = 'auto';
             showResumeBanner();
             render();
+            // Mini oynatıcı göster
+            if (currentStoryId) showMiniPlayer();
         }
 
         // ──────────────── SIDEBARS ────────────────
@@ -1514,9 +1635,9 @@
             if (e.code === 'Escape') closeReader();
         });
 
-        // ──────────────── İNDİRME ────────────────
-        function downloadKayitJs() {
-            // Mevcut tüm kullanıcı verilerini al
+
+        // ──────────────── VERİ EXPORT / IMPORT ────────────────
+        function exportData() {
             const snapshot = {
                 favorites : MuGolKayit.favorites.get(),
                 progress  : MuGolKayit.progress.getAll(),
@@ -1524,69 +1645,202 @@
                 theme     : MuGolKayit.settings.getTheme(),
                 fontSize  : MuGolKayit.settings.getFontSize(),
                 speed     : MuGolKayit.settings.getSpeed(),
+                voiceIdx  : localStorage.getItem('mugol_voiceIdx') || '0',
+                pitch     : localStorage.getItem('mugol_pitch') || '1',
             };
-
-            // Dosyayı fetch et, üstüne otomatik yükleyici blok ekle
-            fetch('hikaye-kayit.js')
-                .then(r => {
-                    if (!r.ok) throw new Error();
-                    return r.text();
-                })
-                .then(src => {
-                    const loader = `/* === KAYITLI VERİLER — otomatik yüklenir === */
-(function(){
-    var d = ${JSON.stringify(snapshot, null, 2)};
-    var map = {
-        favorites : 'mugol_favorites',
-        progress  : 'mugol_progress',
-        readList  : 'mugol_readList',
-        theme     : 'mugol_theme',
-        fontSize  : 'mugol_fontSize',
-        speed     : 'mugol_speed',
-    };
-    Object.keys(d).forEach(function(k){ localStorage.setItem(map[k], JSON.stringify(d[k])); });
-    console.log('[hikaye-kayit] Veriler geri yüklendi:', new Date().toLocaleString('tr-TR'));
-})();
-/* ============================================ */
-
-`;
-                    const blob = new Blob([loader + src], { type: 'text/javascript' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'hikaye-kayit.js';
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    showToast('📥 Verilerle birlikte indirildi!');
-                })
-                .catch(() => {
-                    // fetch başarısız olursa (file:// protokolü vb.) sadece veri bloğunu indir
-                    const blob = new Blob([`/* hikaye-kayit.js — sadece veri bloğu */
-(function(){
-    var d = ${JSON.stringify(snapshot, null, 2)};
-    var map = {
-        favorites : 'mugol_favorites',
-        progress  : 'mugol_progress',
-        readList  : 'mugol_readList',
-        theme     : 'mugol_theme',
-        fontSize  : 'mugol_fontSize',
-        speed     : 'mugol_speed',
-    };
-    Object.keys(d).forEach(function(k){ localStorage.setItem(map[k], JSON.stringify(d[k])); });
-    console.log('[hikaye-kayit] Veriler geri yüklendi.');
-})();
-`], { type: 'text/javascript' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'hikaye-kayit.js';
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    showToast('📥 Veri bloğu indirildi!');
-                });
+            const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mugol-yedek-' + new Date().toISOString().slice(0,10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('\u2705 Veriler d\u0131\u015fa aktar\u0131ld\u0131!');
         }
 
-        window.onload = init;
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                try {
+                    const d = JSON.parse(ev.target.result);
+                    const map = {
+                        favorites : 'mugol_favorites',
+                        progress  : 'mugol_progress',
+                        readList  : 'mugol_readList',
+                        theme     : 'mugol_theme',
+                        fontSize  : 'mugol_fontSize',
+                        speed     : 'mugol_speed',
+                        voiceIdx  : 'mugol_voiceIdx',
+                        pitch     : 'mugol_pitch',
+                    };
+                    Object.keys(map).forEach(k => {
+                        if (d[k] === undefined) return;
+                        const val = d[k];
+                        localStorage.setItem(map[k], typeof val === 'string' ? val : JSON.stringify(val));
+                    });
+                    showToast('\u2705 Veriler geri y\u00fcklendi! Sayfa yenileniyor...');
+                    setTimeout(() => location.reload(), 1500);
+                } catch(err) {
+                    showToast('\u274c Ge\u00e7ersiz yedek dosyas\u0131!');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        // ──────────────── UYKU ZAMANLAYICISI ────────────────
+        let sleepTimerID = null;
+        let sleepEndTime = 0;
+        let sleepCountdownID = null;
+
+        function setSleepTimer(minutes) {
+            clearTimeout(sleepTimerID);
+            clearInterval(sleepCountdownID);
+            document.getElementById('sleepCountdown').textContent = '';
+            if (!minutes || minutes === '0') return;
+            const ms = parseInt(minutes) * 60 * 1000;
+            sleepEndTime = Date.now() + ms;
+            sleepTimerID = setTimeout(() => {
+                if (isPlaying) togglePlay();
+                showToast('\uD83D\uDE34 Uyku zamanlay\u0131c\u0131s\u0131: oynatma durduruldu');
+                document.getElementById('sleepSelect').value = '0';
+                document.getElementById('sleepCountdown').textContent = '';
+                clearInterval(sleepCountdownID);
+            }, ms);
+            sleepCountdownID = setInterval(() => {
+                const left = sleepEndTime - Date.now();
+                if (left <= 0) { clearInterval(sleepCountdownID); return; }
+                const m = Math.floor(left / 60000);
+                const s = Math.floor((left % 60000) / 1000);
+                document.getElementById('sleepCountdown').textContent = m + ':' + String(s).padStart(2,'0');
+            }, 1000);
+            showToast('\uD83D\uDE34 Uyku zamanlay\u0131c\u0131s\u0131: ' + minutes + ' dk');
+        }
+
+        // ──────────────── OKUMA ISTATISTIKLERI ────────────────
+        function showStats() {
+            const allProg = MuGolKayit.progress.getAll();
+            const readList = MuGolKayit.read.list();
+            let totalWords = 0, totalTime = 0, storyCount = 0;
+            kitapListesi.forEach(f => {
+                const id = f.replace('.js','');
+                const data = window['story_' + id];
+                if (!data) return;
+                storyCount++;
+                const wc = data.content.split(/\s+/).length;
+                const pct = allProg[id] || 0;
+                totalWords += Math.round(wc * pct / 100);
+                totalTime += Math.round((wc / 180) * pct / 100);
+            });
+            const favCount = MuGolKayit.favorites.ids().length;
+            const readCount = readList.length;
+
+            let modal = document.getElementById('statsModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'statsModal';
+                modal.style.cssText = 'position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);padding:1.5rem;';
+                modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
+                document.body.appendChild(modal);
+            }
+            modal.innerHTML = `
+                <div style="background:var(--bg-card);border-radius:22px;padding:2rem;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:1.5px solid var(--border-color);animation:slideUp 0.3s ease;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                        <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:800;color:var(--text-dark);">\uD83D\uDCCA \u0130statistiklerim</div>
+                        <button onclick="document.getElementById('statsModal').remove()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-light);">\u2715</button>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        ${statBox('\uD83D\uDCDA','Toplam Hikaye',storyCount)}
+                        ${statBox('\u2705','Tamamlanan',readCount)}
+                        ${statBox('\uD83D\uDD16','Favori',favCount)}
+                        ${statBox('\uD83D\uDCD6','Okunan Kelime','~'+totalWords.toLocaleString('tr'))}
+                        ${statBox('\u23F1\uFE0F','Okuma S\u00fcresi',totalTime+' dk')}
+                        ${statBox('\uD83C\uDFAF','Tamamlama',Math.round(readCount/Math.max(storyCount,1)*100)+'%')}
+                    </div>
+                    <div style="margin-top:1.2rem;background:var(--progress-bg);border-radius:8px;height:8px;overflow:hidden;">
+                        <div style="height:100%;width:${Math.round(readCount/Math.max(storyCount,1)*100)}%;background:linear-gradient(90deg,var(--accent),var(--accent-gold));border-radius:8px;transition:width 0.6s ease;"></div>
+                    </div>
+                </div>`;
+            modal.style.display = 'flex';
+        }
+
+        function statBox(icon, label, value) {
+            return '<div style="background:var(--bg-base);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid var(--border-color);">'
+                + '<div style="font-size:1.5rem;margin-bottom:4px;">'+icon+'</div>'
+                + '<div style="font-size:1.1rem;font-weight:800;color:var(--accent);margin-bottom:2px;">'+value+'</div>'
+                + '<div style="font-size:0.7rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.08em;">'+label+'</div>'
+                + '</div>';
+        }
+
+
+        // ──────────────── SIRALAMA ────────────────
+        function toggleSort() {
+            const p = document.getElementById('sortPanel');
+            p.style.display = p.style.display === 'none' ? 'block' : 'none';
+            document.addEventListener('click', function closeSortPanel(e) {
+                if (!p.contains(e.target) && !document.getElementById('sortBtn').contains(e.target)) {
+                    p.style.display = 'none';
+                    document.removeEventListener('click', closeSortPanel);
+                }
+            }, { once: false });
+        }
+
+        function setSort(mode, btn) {
+            sortMode = mode;
+            document.querySelectorAll('.sort-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('sortPanel').style.display = 'none';
+            const icon = document.getElementById('sortIcon');
+            icon.className = mode === 'default' ? 'fas fa-list'
+                : mode === 'alpha' || mode === 'alpha-desc' ? 'fas fa-font'
+                : mode === 'progress' ? 'fas fa-circle-notch'
+                : 'fas fa-clock';
+            render();
+        }
+
+        // ──────────────── RASTGELE HİKAYE ────────────────
+        function openRandomStory() {
+            const ids = kitapListesi.map(f => f.replace('.js', '')).filter(id => window['story_' + id]);
+            if (!ids.length) return;
+            const id = ids[Math.floor(Math.random() * ids.length)];
+            openReader(id);
+            showToast('\uD83C\uDFB2 Rastgele hikaye seçildi!');
+        }
+
+        // ──────────────── MİNİ OYNATICI ────────────────
+        function showMiniPlayer() {
+            const mp = document.getElementById('miniPlayer');
+            if (!currentStoryId) return;
+            const data = window['story_' + currentStoryId];
+            if (!data) return;
+            document.getElementById('miniTitle').textContent = data.title;
+            document.getElementById('miniPlayBtn').innerHTML = '<i class="fas fa-play"></i>';
+            mp.style.display = 'flex';
+        }
+
+        function resumeMiniPlayer() {
+            if (!currentStoryId) return;
+            openReader(currentStoryId);
+            document.getElementById('miniPlayer').style.display = 'none';
+        }
+
+        function toggleMiniPlay(e) {
+            e.stopPropagation();
+            if (!currentStoryId) return;
+            // Reader'ı yeniden aç, oynat
+            openReader(currentStoryId);
+            document.getElementById('miniPlayer').style.display = 'none';
+            setTimeout(() => { if (!isPlaying) togglePlay(); }, 300);
+        }
+
+        function closeMiniPlayer(e) {
+            e.stopPropagation();
+            document.getElementById('miniPlayer').style.display = 'none';
+        }
+
+                window.onload = init;
     </script>
 </body>
 </html>
