@@ -1,4 +1,4 @@
-var story_hikaye2 = {
+var story_keloglan_ile_devler = {
     title: "Keloğlan ile Devler (Yapay Zeka ile yazıldı)",
     content: `Bir varmış bir yokmuş, evvel zaman içinde kalbur saman içinde, develer tellal iken, pireler berber iken, ben babamın beşiğini tıngır mıngır sallar iken...
 
