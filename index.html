@@ -11,8 +11,6 @@
     <!-- VERİ KAYNAKLARI -->
     <script src="hikaye-kayit.js"></script>
     <script src="kitaplar.js"></script>
-    <script src="hikaye1.js"></script>
-    <script src="hikaye2.js"></script>
 
     <style>
         :root {
@@ -1236,6 +1234,22 @@
 
         // ──────────────── INIT ────────────────
         function init() {
+            // kitapListesi'ndeki script dosyalarını dinamik yükle, hepsi bitince devam et
+            let loaded = 0;
+            const total = kitapListesi.length;
+            if (total === 0) { initAfterLoad(); return; }
+            kitapListesi.forEach(file => {
+                const s = document.createElement('script');
+                s.src = file;
+                s.onload = s.onerror = function() {
+                    loaded++;
+                    if (loaded === total) initAfterLoad();
+                };
+                document.head.appendChild(s);
+            });
+        }
+
+        function initAfterLoad() {
             loadVoices();
             const categories = new Set();
             kitapListesi.forEach(file => {
