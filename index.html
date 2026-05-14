@@ -560,34 +560,7 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        .progress-line {
-            position: relative;
-            width: 100%;
-            height: 5px;
-            background: var(--progress-bg);
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--accent-gold));
-            width: 0%;
-            transition: width 0.4s;
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            right: -6px;
-            top: -3.5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--accent-gold);
-            box-shadow: 0 0 8px rgba(212,168,67,0.6);
-        }
+        /* progress-line is replaced by progress-track in player bar */
 
         .reader-nav {
             padding: 1rem 1.5rem;
@@ -601,7 +574,7 @@
             gap: 12px;
         }
 
-        .reader.focus .reader-nav, .reader.focus .player-bar { opacity: 0; pointer-events: none; }
+        .reader.focus .reader-nav, .reader.focus .player-bar, .reader.focus .now-playing-strip { opacity: 0; pointer-events: none; }
 
         .nav-title {
             font-family: 'Playfair Display', serif;
@@ -666,24 +639,137 @@
             box-shadow: 0 4px 16px rgba(194,98,45,0.35);
         }
 
+        /* ═══════════════════ PODCAST NOW-PLAYING STRIP ═══════════════════ */
+        .now-playing-strip {
+            display: none;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 1.5rem;
+            background: linear-gradient(90deg, rgba(194,98,45,0.12) 0%, rgba(212,168,67,0.08) 100%);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            transition: 0.4s;
+        }
+        .now-playing-strip.visible { display: flex; }
+
+        .waveform {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 22px;
+        }
+        .waveform-bar {
+            width: 3px;
+            border-radius: 3px;
+            background: var(--accent);
+            animation: waveAnim 1.2s ease-in-out infinite;
+            transform-origin: bottom;
+        }
+        .waveform-bar:nth-child(1) { height: 6px;  animation-delay: 0s;    }
+        .waveform-bar:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+        .waveform-bar:nth-child(3) { height: 20px; animation-delay: 0.3s;  }
+        .waveform-bar:nth-child(4) { height: 10px; animation-delay: 0.45s; }
+        .waveform-bar:nth-child(5) { height: 18px; animation-delay: 0.6s;  }
+        .waveform-bar:nth-child(6) { height: 8px;  animation-delay: 0.75s; }
+        .waveform-bar:nth-child(7) { height: 15px; animation-delay: 0.9s;  }
+        .waveform.paused .waveform-bar { animation-play-state: paused; }
+
+        @keyframes waveAnim {
+            0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+            50%       { transform: scaleY(1);   opacity: 1;   }
+        }
+
+        .np-info { flex: 1; min-width: 0; }
+        .np-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1px;
+        }
+        .np-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .np-time {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-light);
+            letter-spacing: 0.04em;
+        }
+        .np-time span { color: var(--accent); }
+
         /* ═══════════════════ PLAYER BAR ═══════════════════ */
         .player-bar {
             background: var(--bg-card2);
-            padding: 1.2rem 2rem;
+            padding: 1rem 1.8rem 1.2rem;
             border-top: 2px solid var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             position: relative;
             transition: 0.4s;
             flex-shrink: 0;
         }
 
+        /* Time scrubber row */
+        .time-row {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .time-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: 0.04em;
+            min-width: 36px;
+        }
+        .time-label.right { text-align: right; }
+        .progress-track {
+            flex: 1;
+            height: 5px;
+            background: var(--progress-bg);
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            overflow: visible;
+        }
+        .progress-track-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-gold));
+            border-radius: 5px;
+            width: 0%;
+            pointer-events: none;
+            position: relative;
+        }
+        .progress-track-fill::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: -4px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            box-shadow: 0 0 8px rgba(212,168,67,0.6);
+            transition: transform 0.2s;
+        }
+        .progress-track:hover .progress-track-fill::after { transform: scale(1.4); }
+
         .player-controls {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1.2rem;
         }
 
         .player-controls .icon-btn {
@@ -917,6 +1003,39 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Wake Lock & Background play badge */
+        .wakelock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 50px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        .wakelock-badge.active {
+            background: rgba(46,213,115,0.15);
+            color: #2ed573;
+            border: 1px solid rgba(46,213,115,0.3);
+        }
+        .wakelock-badge.inactive {
+            background: rgba(255,255,255,0.06);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+        }
+
+        /* MediaSession supported indicator */
+        .mediasession-strip {
+            font-size: 0.68rem;
+            color: var(--text-light);
+            text-align: center;
+            padding: 4px 0 0;
+            letter-spacing: 0.04em;
+        }
     </style>
 </head>
 <body>
@@ -1077,6 +1196,15 @@
                     <span class="toggle-label"><i class="fas fa-redo" style="margin-right:8px;color:var(--accent)"></i>Döngü Modu</span>
                     <label class="switch"><input type="checkbox" id="loopToggle"><span class="slider"></span></label>
                 </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">
+                        <i class="fas fa-sun" style="margin-right:8px;color:var(--accent-gold)"></i>
+                        Ekran Açık Kalsın
+                        <span id="wakeLockBadge" class="wakelock-badge inactive" style="margin-left:6px;">⬤ Kapalı</span>
+                    </span>
+                    <label class="switch"><input type="checkbox" id="wakeLockToggle" onchange="onWakeLockToggle(this.checked)"><span class="slider"></span></label>
+                </div>
+                <div class="mediasession-strip" id="mediaSessionInfo"></div>
             </div>
 
             <div class="setting-item">
@@ -1121,18 +1249,36 @@
 
     <!-- OKUYUCU -->
     <div class="reader" id="reader">
-        <div class="progress-line" onclick="seekStory(event)">
-            <div class="progress-fill" id="pFill"></div>
-        </div>
         <nav class="reader-nav">
             <button class="icon-btn" onclick="closeReader()" title="Geri">
                 <i class="fas fa-arrow-left"></i>
             </button>
             <div class="nav-title" id="navTitle">Okunuyor...</div>
+            <button class="icon-btn" id="readerFavBtn" onclick="toggleReaderFav()" title="Favorilere ekle">
+                <i class="far fa-bookmark"></i>
+            </button>
             <button class="icon-btn" onclick="toggleSidebar('right')" title="Ayarlar">
                 <i class="fas fa-sliders-h"></i>
             </button>
         </nav>
+
+        <!-- PODCAST NOW-PLAYING STRIP -->
+        <div class="now-playing-strip" id="nowPlayingStrip">
+            <div class="waveform paused" id="waveform">
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+                <div class="waveform-bar"></div>
+            </div>
+            <div class="np-info">
+                <div class="np-label">Şimdi Oynatılıyor</div>
+                <div class="np-title" id="npTitle">—</div>
+            </div>
+            <div class="np-time" id="npTime"><span>0:00</span> / 0:00</div>
+        </div>
 
         <div class="reader-content" id="rScrollCont">
             <div class="text-well" id="textWell">
@@ -1142,6 +1288,14 @@
         </div>
 
         <div class="player-bar">
+            <!-- Time scrubber row -->
+            <div class="time-row">
+                <span class="time-label" id="timeElapsed">0:00</span>
+                <div class="progress-track" id="progressTrack" onclick="seekStory(event)">
+                    <div class="progress-track-fill" id="progressTrackFill"></div>
+                </div>
+                <span class="time-label right" id="timeTotal">0:00</span>
+            </div>
             <div class="player-controls">
                 <button class="icon-btn" onclick="skip(-5)" title="-5 Cümle"><i class="fas fa-backward"></i></button>
                 <button class="icon-btn" onclick="skip(-1)" title="Önceki"><i class="fas fa-step-backward"></i></button>
@@ -1173,6 +1327,115 @@
         let sortMode = 'default';
         const synth = window.speechSynthesis;
         let voices = [];
+
+        // ──────────────── WAKE LOCK ────────────────
+        let wakeLock = null;
+        let wakeLockEnabled = localStorage.getItem('mugol_wakelock') !== 'false'; // varsayılan: açık
+
+        async function requestWakeLock() {
+            if (!wakeLockEnabled) return;
+            if (!('wakeLock' in navigator)) return;
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => {
+                    // Sistem serbest bırakırsa (örn. pil tasarrufu), tekrar iste
+                    wakeLock = null;
+                    updateWakeLockUI(false);
+                    if (isPlaying && wakeLockEnabled) {
+                        setTimeout(requestWakeLock, 500);
+                    }
+                });
+                updateWakeLockUI(true);
+            } catch(e) {
+                updateWakeLockUI(false);
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock) {
+                wakeLock.release();
+                wakeLock = null;
+            }
+            updateWakeLockUI(false);
+        }
+
+        function updateWakeLockUI(active) {
+            const badge = document.getElementById('wakeLockBadge');
+            if (!badge) return;
+            if (active) {
+                badge.textContent = '⬤ Aktif';
+                badge.className = 'wakelock-badge active';
+            } else {
+                badge.textContent = '⬤ Kapalı';
+                badge.className = 'wakelock-badge inactive';
+            }
+        }
+
+        function onWakeLockToggle(checked) {
+            wakeLockEnabled = checked;
+            localStorage.setItem('mugol_wakelock', checked);
+            if (checked && isPlaying) {
+                requestWakeLock();
+            } else if (!checked) {
+                releaseWakeLock();
+            }
+            showToast(checked ? '🔆 Ekran açık kalacak' : '🌙 Ekran kilidi normal');
+        }
+
+        // ──────────────── MEDIASESSION API ────────────────
+        function setupMediaSession(title) {
+            if (!('mediaSession' in navigator)) return;
+            try {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: title || 'MuGöl Hikaye',
+                    artist: 'MuGöl Hikayeler',
+                    album: 'Sesli Kitaplık'
+                });
+                navigator.mediaSession.setActionHandler('play', () => {
+                    if (!isPlaying) togglePlay();
+                });
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    if (isPlaying) togglePlay();
+                });
+                navigator.mediaSession.setActionHandler('previoustrack', () => skip(-1));
+                navigator.mediaSession.setActionHandler('nexttrack', () => skip(1));
+                navigator.mediaSession.setActionHandler('seekbackward', () => skip(-5));
+                navigator.mediaSession.setActionHandler('seekforward', () => skip(5));
+                // Bilgi mesajı
+                const info = document.getElementById('mediaSessionInfo');
+                if (info) info.textContent = '📱 Kilit ekranından kontrol edilebilir';
+            } catch(e) {}
+        }
+
+        function updateMediaSessionState(playing) {
+            if (!('mediaSession' in navigator)) return;
+            try {
+                navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
+            } catch(e) {}
+        }
+
+        // ──────────────── GÖRÜNÜRLÜK / ARKA PLAN DESTEĞI ────────────────
+        // Ekran açıldığında durmuşsa kaldığı yerden devam et
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && isPlaying && !synth.speaking) {
+                // Kısa bekleme: tarayıcı sesi resume etmesine izin ver
+                setTimeout(() => {
+                    if (isPlaying && !synth.speaking) {
+                        startTTS();
+                    }
+                }, 300);
+            }
+        });
+
+        // ──────────────── SPEECHSYNTHESIS KEEPALIVE ────────────────
+        // Bazı tarayıcılar ~14-15 saniyede sentezi sessizce keser.
+        // Yalnızca synth aktif konuşurken pause+resume yapıyoruz.
+        // Watchdog kaldırıldı — onend tetiklenmezse visibilitychange halleder.
+        setInterval(() => {
+            if (!isPlaying || !synth.speaking || document.hidden) return;
+            synth.pause();
+            synth.resume();
+        }, 10000);
 
         // ──────────────── VOICES ────────────────
         function loadVoices() {
@@ -1251,6 +1514,19 @@
 
         function initAfterLoad() {
             loadVoices();
+
+            // Wake Lock toggle durumunu yükle
+            const wlToggle = document.getElementById('wakeLockToggle');
+            if (wlToggle) wlToggle.checked = wakeLockEnabled;
+
+            // MediaSession desteği bilgisi
+            const msInfo = document.getElementById('mediaSessionInfo');
+            if (msInfo) {
+                msInfo.textContent = ('mediaSession' in navigator)
+                    ? '📱 Kilit ekranı kontrolü destekleniyor'
+                    : '';
+            }
+
             const categories = new Set();
             kitapListesi.forEach(file => {
                 const id = file.replace('.js', '');
@@ -1435,6 +1711,10 @@
             document.getElementById('rTitle').innerText = data.title;
             document.getElementById('navTitle').innerText = data.title;
 
+            // Now-playing strip başlık
+            const npTitle = document.getElementById('npTitle');
+            if (npTitle) npTitle.textContent = data.title;
+
             sentences = data.content.match(/[^.!?]+[.!?]+/g) || [data.content];
 
             // Kaldığın yerden devam
@@ -1450,9 +1730,18 @@
             document.getElementById('reader').classList.add('open');
             document.body.style.overflow = 'hidden';
 
+            // Waveform & strip sıfırla
+            const wf = document.getElementById('waveform');
+            if (wf) wf.classList.add('paused');
+            const strip = document.getElementById('nowPlayingStrip');
+            if (strip) strip.classList.add('visible');
+
             // Favori butonu güncelle
             updateReaderFavBtn();
             updateUI();
+
+            // MediaSession kur (kilit ekranı kontrolü)
+            setupMediaSession(data.title);
         }
 
         function updateReaderFavBtn() {
@@ -1462,6 +1751,37 @@
             btn.innerHTML = `<i class="${isFav ? 'fas' : 'far'} fa-bookmark"></i>`;
             btn.title = isFav ? 'Favoriden çıkar' : 'Favorilere ekle';
             btn.classList.toggle('fav-active', isFav);
+        }
+
+        function toggleReaderFav() {
+            if (!currentStoryId) return;
+            const nowFav = MuGolKayit.favorites.toggle(currentStoryId);
+            updateReaderFavBtn();
+            updateStatsBar();
+            showToast(nowFav ? '🔖 Favorilere eklendi!' : '📌 Favorilerden çıkarıldı');
+        }
+
+        // ──────────────── TIME HELPERS ────────────────
+        function estimateSecsPerSentence() {
+            const rate = parseFloat(document.getElementById('speedSelect').value) || 1;
+            // avg Turkish sentence ~12 words, ~0.45s/word at 1x
+            return 12 * 0.45 / rate;
+        }
+
+        function secsToMMSS(s) {
+            const m = Math.floor(s / 60);
+            const ss = Math.floor(s % 60);
+            return m + ':' + String(ss).padStart(2, '0');
+        }
+
+        function updateTimeDisplay() {
+            const sps = estimateSecsPerSentence();
+            const elapsed = Math.round(sIdx * sps);
+            const total   = Math.round(sentences.length * sps);
+            document.getElementById('timeElapsed').textContent = secsToMMSS(elapsed);
+            document.getElementById('timeTotal').textContent   = secsToMMSS(total);
+            const npEl = document.getElementById('npTime');
+            if (npEl) npEl.innerHTML = `<span>${secsToMMSS(elapsed)}</span> / ${secsToMMSS(total)}`;
         }
 
         function updateUI() {
@@ -1475,8 +1795,12 @@
             }
 
             const pct = ((sIdx + 1) / sentences.length) * 100;
-            document.getElementById('pFill').style.width = pct + '%';
+            // New scrubber
+            const fill = document.getElementById('progressTrackFill');
+            if (fill) fill.style.width = pct + '%';
+
             document.getElementById('curS').innerText = sIdx + 1;
+            updateTimeDisplay();
 
             // İlerlemeyi kaydet
             if (currentStoryId) {
@@ -1496,48 +1820,75 @@
                 isPlaying = false;
                 document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
                 document.getElementById('playBtn').classList.remove('playing');
+                // Waveform durdur
+                const wf = document.getElementById('waveform');
+                if (wf) wf.classList.add('paused');
+                // Wake Lock bırak
+                releaseWakeLock();
+                // MediaSession güncelle
+                updateMediaSessionState(false);
             } else {
                 isPlaying = true;
                 document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
                 document.getElementById('playBtn').classList.add('playing');
+                // Waveform başlat
+                const wf = document.getElementById('waveform');
+                if (wf) wf.classList.remove('paused');
+                // Now-playing strip göster
+                const strip = document.getElementById('nowPlayingStrip');
+                if (strip) strip.classList.add('visible');
+                // Wake Lock iste (ekranı kapatmasın)
+                requestWakeLock();
+                // MediaSession güncelle
+                updateMediaSessionState(true);
                 startTTS();
             }
         }
+
+        // ── TTS nesil sayacı: cancel() sonrası eski onend'leri engeller ──
+        let _ttsGen = 0;
 
         function startTTS() {
             if (!isPlaying || sIdx >= sentences.length) {
                 if (isPlaying) {
                     const loop = document.getElementById('loopToggle').checked;
-                    if (loop) {
-                        sIdx = 0;
-                        updateUI();
-                        startTTS();
-                    } else {
-                        togglePlay();
-                    }
+                    if (loop) { sIdx = 0; updateUI(); startTTS(); }
+                    else { togglePlay(); }
                 }
                 return;
             }
+
+            const gen = ++_ttsGen; // cancel() önceki onend'i tetiklerse yoksayılır
+
             synth.cancel();
+
             const utter = new SpeechSynthesisUtterance(sentences[sIdx]);
-            const vIdx = document.getElementById('voiceSelect').value;
+            const vIdx  = document.getElementById('voiceSelect').value;
             if (voices[vIdx]) utter.voice = voices[vIdx];
             const spd = parseFloat(document.getElementById('speedSelect').value);
-            utter.rate = spd;
+            utter.rate  = spd;
             utter.pitch = parseFloat(document.getElementById('pitchSlider').value);
-            utter.lang = 'tr-TR';
+            utter.lang  = 'tr-TR';
             MuGolKayit.settings.saveSpeed(spd);
+
             utter.onend = () => {
-                if (isPlaying) {
-                    sIdx++;
-                    if (sIdx < sentences.length) { updateUI(); startTTS(); }
-                    else {
-                        const loop = document.getElementById('loopToggle').checked;
-                        if (loop) { sIdx = 0; updateUI(); startTTS(); }
-                        else togglePlay();
-                    }
+                if (gen !== _ttsGen) return; // eski nesil → yoksay
+                if (!isPlaying) return;
+                sIdx++;
+                if (sIdx < sentences.length) { updateUI(); startTTS(); }
+                else {
+                    const loop = document.getElementById('loopToggle').checked;
+                    if (loop) { sIdx = 0; updateUI(); startTTS(); }
+                    else { togglePlay(); }
                 }
             };
+
+            utter.onerror = (e) => {
+                if (gen !== _ttsGen) return;
+                if (e.error === 'interrupted' || e.error === 'canceled') return;
+                if (isPlaying) setTimeout(() => { if (isPlaying && gen === _ttsGen) startTTS(); }, 400);
+            };
+
             synth.speak(utter);
         }
 
@@ -1548,7 +1899,6 @@
             updateUI();
             if (isPlaying) startTTS();
         }
-
         function skip(dir) {
             sIdx = Math.max(0, Math.min(sIdx + dir, sentences.length - 1));
             updateUI();
@@ -1570,6 +1920,15 @@
             document.getElementById('reader').classList.remove('open', 'focus');
             document.getElementById('focusToggle').checked = false;
             document.body.style.overflow = 'auto';
+            // Waveform & strip sıfırla
+            const wf = document.getElementById('waveform');
+            if (wf) wf.classList.add('paused');
+            const strip = document.getElementById('nowPlayingStrip');
+            if (strip) strip.classList.remove('visible');
+            // Wake Lock bırak
+            releaseWakeLock();
+            // MediaSession güncelle
+            updateMediaSessionState(false);
             showResumeBanner();
             render();
             // Mini oynatıcı göster
