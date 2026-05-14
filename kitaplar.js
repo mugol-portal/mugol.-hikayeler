@@ -1,5 +1,5 @@
 const kitapListesi = [
     "keloglan_ile_devler.js",
-    "hikaye2.js",
+    "karo_ile_dostluk.js",
     "hikaye3.js"
 ];
