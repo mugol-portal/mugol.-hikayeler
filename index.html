@@ -1415,27 +1415,27 @@
         }
 
         // ──────────────── GÖRÜNÜRLÜK / ARKA PLAN DESTEĞI ────────────────
-        // Ekran açıldığında durmuşsa kaldığı yerden devam et
+        // Sekme tekrar görünür olduğunda watchdog zaten devreye girer.
+        // _ttsStartedAt sıfırlayarak grace period'u anında bitiriyoruz.
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && isPlaying && !synth.speaking) {
-                // Kısa bekleme: tarayıcı sesi resume etmesine izin ver
-                setTimeout(() => {
-                    if (isPlaying && !synth.speaking) {
-                        startTTS();
-                    }
-                }, 300);
+            if (!document.hidden && isPlaying) {
+                _ttsStartedAt = 0; // watchdog hemen kontrol etsin
             }
         });
 
-        // ──────────────── SPEECHSYNTHESIS KEEPALIVE ────────────────
-        // Bazı tarayıcılar ~14-15 saniyede sentezi sessizce keser.
-        // Yalnızca synth aktif konuşurken pause+resume yapıyoruz.
-        // Watchdog kaldırıldı — onend tetiklenmezse visibilitychange halleder.
+        // ──────────────── WATCHDOG ────────────────
+        // pause/resume bazı tarayıcılarda onend'i bozuyor, hiç kullanmıyoruz.
+        // Bunun yerine: synth sessizleştiyse ama isPlaying=true ise → startTTS ile devam et.
+        // _ttsStartedAt: her speak() çağrısında güncellenir, grace period = 1.5s.
+        let _ttsStartedAt = 0;
         setInterval(() => {
-            if (!isPlaying || !synth.speaking || document.hidden) return;
-            synth.pause();
-            synth.resume();
-        }, 10000);
+            if (!isPlaying) return;
+            if (synth.speaking || synth.pending) return;
+            // Yeni bir konuşma başlatıldıktan sonra 1.5s grace ver
+            if (Date.now() - _ttsStartedAt < 1500) return;
+            // Sessizlik var ve oynatma açık → devam et
+            startTTS();
+        }, 1000);
 
         // ──────────────── VOICES ────────────────
         function loadVoices() {
@@ -1889,6 +1889,7 @@
                 if (isPlaying) setTimeout(() => { if (isPlaying && gen === _ttsGen) startTTS(); }, 400);
             };
 
+            _ttsStartedAt = Date.now();
             synth.speak(utter);
         }
 
