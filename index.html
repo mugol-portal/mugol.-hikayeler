@@ -11,7 +11,7 @@
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1410">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="logo.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MuGöl Hikayeler">
@@ -1045,77 +1045,6 @@
             letter-spacing: 0.04em;
         }
 
-        /* ═══════════════════ PWA KURULUM MODALI ═══════════════════ */
-        .install-modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-            background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(4px);
-        }
-        .install-modal-overlay.show { display: flex; }
-        .install-modal-sheet {
-            background: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            width: 100%;
-            max-width: 480px;
-            border-radius: 22px 22px 0 0;
-            padding: 1.6rem 1.5rem 2rem;
-            box-shadow: 0 -12px 40px rgba(0,0,0,0.4);
-            animation: slideUp 0.3s ease;
-        }
-        .install-modal-title {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 500;
-            margin-bottom: 1.2rem;
-            color: var(--sidebar-text);
-        }
-        .install-modal-row {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 1.6rem;
-        }
-        .install-modal-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            object-fit: cover;
-            flex-shrink: 0;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-        }
-        .install-modal-name {
-            font-weight: 700;
-            font-size: 1.05rem;
-            color: var(--sidebar-text);
-            line-height: 1.3;
-        }
-        .install-modal-url {
-            font-size: 0.85rem;
-            color: rgba(240,235,227,0.55);
-            margin-top: 2px;
-        }
-        .install-modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 2rem;
-        }
-        .install-modal-actions button {
-            background: none;
-            border: none;
-            color: var(--accent-gold);
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            padding: 8px 4px;
-            letter-spacing: 0.02em;
-        }
-        .install-modal-actions button:hover { color: var(--accent2); }
     </style>
 </head>
 <body>
@@ -1202,29 +1131,11 @@
             <li class="side-item" onclick="closeSidebars(); setTimeout(function(){ toggleSidebar('right'); }, 300);">
                 <i class="fas fa-sliders-h"></i> Ayarlar
             </li>
-            <li class="side-item" id="installMenuBtn" onclick="showInstallModal(); closeSidebars();">
+            <li class="side-item" id="installMenuBtn" onclick="installApp(); closeSidebars();">
                 <i class="fas fa-download"></i> Uygulamayı indir
             </li>
         </ul>
     </nav>
-
-    <!-- PWA KURULUM MODALI -->
-    <div class="install-modal-overlay" id="installModalOverlay" onclick="if(event.target===this) hideInstallModal();">
-        <div class="install-modal-sheet">
-            <div class="install-modal-title">Uygulamayı yükle</div>
-            <div class="install-modal-row">
-                <img class="install-modal-icon" src="icon-192.png" alt="MuGöl Hikayeler" onerror="this.style.display='none'">
-                <div>
-                    <div class="install-modal-name">MuGöl Hikayeler</div>
-                    <div class="install-modal-url" id="installModalUrl"></div>
-                </div>
-            </div>
-            <div class="install-modal-actions">
-                <button onclick="hideInstallModal()">İptal</button>
-                <button onclick="triggerInstall()">Yükle</button>
-            </div>
-        </div>
-    </div>
 
     <!-- SAĞ MENÜ - Ayarlar -->
     <nav class="sidebar right" id="rightSidebar">
@@ -2082,41 +1993,8 @@
             MuGolKayit.settings.saveFontSize(fontSz);
         }
 
-        // ──────────────── PWA KURULUM ────────────────
+        // ──────────────── PWA: SERVICE WORKER + KURULUM ────────────────
         let deferredInstallPrompt = null;
-
-        window.addEventListener('beforeinstallprompt', function(e) {
-            e.preventDefault();
-            deferredInstallPrompt = e;
-        });
-
-        window.addEventListener('appinstalled', function() {
-            deferredInstallPrompt = null;
-            showToast('✅ MuGöl Hikayeler uygulamanıza eklendi!');
-        });
-
-        function showInstallModal() {
-            document.getElementById('installModalUrl').textContent = location.hostname || location.href;
-            document.getElementById('installModalOverlay').classList.add('show');
-        }
-
-        function hideInstallModal() {
-            document.getElementById('installModalOverlay').classList.remove('show');
-        }
-
-        async function triggerInstall() {
-            hideInstallModal();
-            if (deferredInstallPrompt) {
-                deferredInstallPrompt.prompt();
-                const choice = await deferredInstallPrompt.userChoice;
-                deferredInstallPrompt = null;
-                if (choice.outcome === 'accepted') {
-                    showToast('✅ MuGöl Hikayeler uygulamanıza eklendi!');
-                }
-            }
-            // Tarayıcı otomatik kurulum istemini desteklemiyorsa (ör. yerel test, iOS Safari)
-            // hiçbir uyarı gösterilmez; modal sessizce kapanır.
-        }
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
@@ -2125,6 +2003,23 @@
                 });
             });
         }
+
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+        });
+
+        async function installApp() {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+        }
+
+        window.addEventListener('appinstalled', function() {
+            deferredInstallPrompt = null;
+            showToast('✅ MuGöl Hikayeler uygulamanıza eklendi!');
+        });
 
         function showToast(msg) {
             const t = document.getElementById('toast');

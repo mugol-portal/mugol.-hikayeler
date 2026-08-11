@@ -1,16 +1,14 @@
-// MuGöl Hikayeler - basit service worker (PWA kurulabilirliği için)
 const CACHE_NAME = 'mugol-hikayeler-v1';
-const CORE_ASSETS = [
-  './',
+const APP_SHELL = [
   './index.html',
   './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)).catch(() => {})
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
   );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -26,7 +24,16 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request).catch(() => cached);
+      const network = fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => cached);
+      return cached || network;
     })
   );
 });
